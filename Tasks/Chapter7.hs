@@ -1,140 +1,71 @@
--- 1. Define Color and implement Eq
-data Color = Red | Green | Blue deriving (Show, Read, Enum, Bounded)
+-- Chapter 7: Practical and Homework Tasks
 
-instance Eq Color where
-  Red   == Red   = True
-  Green == Green = True
-  Blue  == Blue  = True
-  _     == _     = False
+-- HC7T1 & HC7T2: Color with Eq, Ord, and Enum instances
+data Color = Red | Green | Blue deriving (Show, Eq, Enum, Ord)
 
-main1 :: IO ()
-main1 = do
-  print (Red == Red)
-  print (Red == Green)
-
--- 2. Implement Ord for Color (Red < Green < Blue)
-instance Ord Color where
-  compare Red Green   = LT
-  compare Red Blue    = LT
-  compare Green Blue  = LT
-  compare a b
-    | a == b    = EQ
-    | otherwise = GT
-
-main2 :: IO ()
-main2 = do
-  print (Red < Green)
-  print (Blue > Green)
-  print (Red == Red)
-
--- 3. Function with Eq and Ord constraints
+-- HC7T3: compareValues function with Eq and Ord
 compareValues :: (Eq a, Ord a) => a -> a -> a
-compareValues a b = if a >= b then a else b
+compareValues x y
+  | x >= y    = x
+  | otherwise = y
 
-main3 :: IO ()
-main3 = do
-  print (compareValues 10 20)
-  print (compareValues "apple" "banana")
-
--- 4. Shape with Show and Read
+-- HC7T4: Shape with Show and Read
 data Shape = Circle Double | Rectangle Double Double
+    deriving (Show, Read)
 
-instance Show Shape where
-  show (Circle r) = "Circle " ++ show r
-  show (Rectangle w h) = "Rectangle " ++ show w ++ " " ++ show h
-
-instance Read Shape where
-  readsPrec _ input =
-    case words input of
-      ["Circle", r]       -> [(Circle (read r), "")]
-      ["Rectangle", w, h] -> [(Rectangle (read w) (read h), "")]
-      _                   -> []
-
-main4 :: IO ()
-main4 = do
-  let c = Circle 5.0
-  let r = Rectangle 3.0 4.0
-  print c
-  print r
-  print (read "Circle 7.5" :: Shape)
-  print (read "Rectangle 6.0 2.0" :: Shape)
-
--- 5. squareArea with Num constraint
+-- HC7T5: squareArea function with Num constraint
 squareArea :: Num a => a -> a
 squareArea side = side * side
 
-main5 :: IO ()
-main5 = print (squareArea 4.5)
+-- Homework Q4: Type Signatures
+f1 :: (Fractional a, Show a) => a -> a -> String -> String
+f1 x y z = show (x / y) ++ z
 
--- 6. circleCircumference with Integral and Floating
-circleCircumference :: (Integral a, Floating b) => a -> b
-circleCircumference r = 2 * pi * fromIntegral r
+f2 :: (Eq a, Bounded a, Enum a) => a -> a
+f2 x = if x == maxBound then minBound else succ x
 
-main6 :: IO ()
-main6 = print (circleCircumference 7 :: Double)
-
--- 7. nextColor with Bounded and Enum
-nextColor :: Color -> Color
-nextColor c
-  | c == maxBound = minBound
-  | otherwise     = succ c
-
-main7 :: IO ()
-main7 = do
-  print (nextColor Red)     -- Green
-  print (nextColor Green)   -- Blue
-  print (nextColor Blue)    -- Red (wraps)
-
--- 8. parseShape using Read
-parseShape :: String -> Maybe Shape
-parseShape str =
-  case reads str :: [(Shape, String)] of
-    [(s, "")] -> Just s
-    _         -> Nothing
-
-main8 :: IO ()
-main8 = do
-  print (parseShape "Circle 10.0")
-  print (parseShape "Rectangle 3.0 6.0")
-  print (parseShape "Square 5.0")
-
--- 9. Describable type class
-class Describable a where
-  describe :: a -> String
-
-instance Describable Bool where
-  describe True = "Yes"
-  describe False = "No"
-
-instance Describable Shape where
-  describe (Circle r) = "A circle with radius " ++ show r
-  describe (Rectangle w h) = "A rectangle " ++ show w ++ "x" ++ show h
-
-main9 :: IO ()
-main9 = do
-  print (describe True)
-  print (describe (Rectangle 4 5))
-
--- 10. describeAndCompare with constraints
-describeAndCompare :: (Describable a, Ord a) => a -> a -> String
-describeAndCompare a b =
-  if a >= b then describe a else describe b
-
-main10 :: IO ()
-main10 = do
-  print (describeAndCompare True False)
-  print (describeAndCompare (Circle 3) (Circle 5))  -- uses Show ordering (not very meaningful here)
-
--- Master main
+-- Main to run everything
 main :: IO ()
 main = do
-  main1
-  main2
-  main3
-  main4
-  main5
-  main6
-  main7
-  main8
-  main9
-  main10
+    -- HC7T1: Eq Example
+    putStrLn "HC7T1: Color Eq Examples"
+    print (Red == Red)   -- True
+    print (Red == Blue)  -- False
+
+    -- HC7T2: Ord Example
+    putStrLn "\nHC7T2: Color Ord Examples"
+    print (Red < Green)  -- True
+    print (Green < Blue) -- True
+    print (Blue < Red)   -- False
+
+    -- HC7T3: compareValues
+    putStrLn "\nHC7T3: compareValues Examples"
+    print (compareValues 5 10)      -- 10
+    print (compareValues 'a' 'z')   -- 'z'
+
+    -- HC7T4: Shape Show and Read
+    putStrLn "\nHC7T4: Shape Show and Read"
+    let circle = Circle 5.0
+    let rectangle = Rectangle 3.0 4.0
+    print circle
+    print rectangle
+    print (read "Circle 7.5" :: Shape)
+    print (read "Rectangle 3.0 6.0" :: Shape)
+
+    -- HC7T5: squareArea
+    putStrLn "\nHC7T5: squareArea Examples"
+    print (squareArea 4)    -- 16
+    print (squareArea 5.5)  -- 30.25
+
+    -- Homework Q3: Enum
+    putStrLn "\nHomework Q3: Enum Examples"
+    print (succ 'A')          -- 'B'
+    print (pred 5)            -- 4
+    print ([1..5])            -- [1,2,3,4,5]
+    print ([Red .. Blue])     -- [Red,Green,Blue]
+
+    -- Homework Q4: Type Signatures
+    putStrLn "\nHomework Q4: f1 and f2 Examples"
+    print (f1 6 3 " result")   -- "2.0 result"
+    print (f2 (5 :: Int))      -- 6
+    print (f2 (maxBound :: Int)) -- minBound
