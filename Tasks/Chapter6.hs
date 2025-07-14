@@ -1,3 +1,5 @@
+-- Chapter 6: Practical and Homework Tasks
+
 -- 1. Recursive factorial
 factorial :: Int -> Int
 factorial 0 = 1
@@ -37,63 +39,30 @@ reverseList (x:xs) = reverseList xs ++ [x]
 main5 :: IO ()
 main5 = print (reverseList [1,2,3,4]) -- Output: [4,3,2,1]
 
--- 6. Element exists in list
-elementExists :: Eq a => a -> [a] -> Bool
-elementExists _ [] = False
-elementExists x (y:ys)
-  | x == y    = True
-  | otherwise = elementExists x ys
+-- 6. zipWith' function
+zipWith' :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith' _ [] _ = []
+zipWith' _ _ [] = []
+zipWith' f (x:xs) (y:ys) = f x y : zipWith' f xs ys
 
 main6 :: IO ()
-main6 = do
-  print (elementExists 3 [1,2,3,4]) -- True
-  print (elementExists 9 [1,2,3])   -- False
+main6 = print (zipWith' (+) [1,2,3] [4,5,6]) -- Output: [5,7,9]
 
--- 7. Length of list
-listLength :: [a] -> Int
-listLength [] = 0
-listLength (_:xs) = 1 + listLength xs
+-- 7. takeWhile' function
+takeWhile' :: (a -> Bool) -> [a] -> [a]
+takeWhile' _ [] = []
+takeWhile' p (x:xs)
+    | p x       = x : takeWhile' p xs
+    | otherwise = []
 
 main7 :: IO ()
-main7 = print (listLength [10, 20, 30]) -- Output: 3
-
--- 8. Filter even numbers
-filterEvens :: [Int] -> [Int]
-filterEvens [] = []
-filterEvens (x:xs)
-  | even x    = x : filterEvens xs
-  | otherwise = filterEvens xs
-
-main8 :: IO ()
-main8 = print (filterEvens [1..10]) -- Output: [2,4,6,8,10]
-
--- 9. Implement map
-mapCustom :: (a -> b) -> [a] -> [b]
-mapCustom _ [] = []
-mapCustom f (x:xs) = f x : mapCustom f xs
-
-main9 :: IO ()
-main9 = print (mapCustom (+2) [1,2,3]) -- Output: [3,4,5]
-
--- 10. Recursive digits extraction
-digits :: Int -> [Int]
-digits n
-  | n < 10 = [n]
-  | otherwise = digits (n `div` 10) ++ [n `mod` 10]
-
-main10 :: IO ()
-main10 = print (digits 12345) -- Output: [1,2,3,4,5]
+main7 = do
+  print (takeWhile' (<3) [1,2,3,4,1,2,3,4]) -- Output: [1,2]
+  print (takeWhile' (<9) [1,2,3])           -- Output: [1,2,3]
+  print (takeWhile' (<0) [1,2,3])           -- Output: []
 
 -- Master main to run all
 main :: IO ()
 main = do
-  main1
-  main2
-  main3
-  main4
-  main5
-  main6
-  main7
-  main8
-  main9
-  main10
+  putStrLn "1. Factorial of 5:"
+
